@@ -7,7 +7,12 @@ const expressValidator = require('express-validator');
 const mongoose = require('mongoose');
 const http = require('http');
 const socketIO = require('socket.io');
-const Message = require('./models/message.js');
+const passport = require('passport');
+const flash = require('connect-flash');
+
+
+//url to connect database
+const configDB = require('./config/database')
 //app instance
 const app = express();
 
@@ -27,10 +32,9 @@ const server = http.createServer(app);
 const io = socketIO(server)
 
 
-//url to connect database and use connect()
-const url = 'mongodb://localhost:27017/messageboard';
 
-mongoose.connect(url,(err,db)=>{
+
+mongoose.connect(configDB.url,(err,db)=>{
   if(err){
     console.log('Unable to connect, Error:',err);
   } else{
@@ -38,28 +42,14 @@ mongoose.connect(url,(err,db)=>{
   }
 })
 
-//api end points handling get and post methods
-app.get('/',(req,res)=>{
-  res.send('login page')
-})
-app.get('/api/message/',(req,res)=>{
-  User.find({}).then(user=>{
-    res.json(user)
-  })
-})
-app.post('/api/message/',(req,res)=>{
-  console.log('posted');
-  Message.create({
-    name:req.body.name,
-    message:req.body.message,
-  }).then(message =>{
-    res.json(message)
-    io.emit('new message', message ,broadcast=true)
-  })
-
-
-})
-
+//pass passport for configuration
+require('./config/passport.js')(passport);
+//required for paasport setup
+app.use(passport.initialize());
+//app.use(flash());
+//app.use(passport.session());
+//routes
+require('./Router.js')(app,passport,io) //load routes and pass app and fully configured passport
 //listening at localhost port 3000
 server.listen(3000,()=>{
   console.log('App is listening at port 3000');
