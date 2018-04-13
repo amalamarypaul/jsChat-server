@@ -7,7 +7,7 @@ const expressValidator = require('express-validator');
 const mongoose = require('mongoose');
 const http = require('http');
 const socketIO = require('socket.io');
-const User = require('./models/messageboard.js');
+const Message = require('./models/message.js');
 //app instance
 const app = express();
 
@@ -49,12 +49,12 @@ app.get('/api/message/',(req,res)=>{
 })
 app.post('/api/message/',(req,res)=>{
   console.log('posted');
-  User.create({
+  Message.create({
     name:req.body.name,
     message:req.body.message,
-  }).then(user =>{
-    res.json(user)
-    io.emit('new message', user,broadcast=true)
+  }).then(message =>{
+    res.json(message)
+    io.emit('new message', message ,broadcast=true)
   })
 
 
