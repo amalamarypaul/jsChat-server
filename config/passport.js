@@ -1,6 +1,8 @@
 const LocalStrategy = require('passport-local').Strategy;
-
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const configDB = require('./database')
 
 // expose this function to our app using module.exports
 module.exports = (passport) => {
@@ -18,33 +20,33 @@ module.exports = (passport) => {
 
   // signup
   passport.use('local-signup', new LocalStrategy({
-    usernameField : 'username',
+    usernameField : 'email',
     passwordField : 'password',
     passReqToCallback : true
   },
-(req,username,password,done)=>{
+(req,email,password,done)=>{
 
   process.nextTick(()=>{
-    User.findOne({'username':username},(err, user) =>{
+    User.findOne({'email':email},(err, user) =>{
       if (err) {
         return done(err);
       }
+
       if (user) {
-        req.body={
-          signupMessage: 'That email is already taken.'
+        const message={
+          error:'That email is already taken'
         }
-        return done(null, false, {signupMessage: 'That email is already taken.'});
+        return done(null,false, message );
       } else {
         const newUser = new User();
-        newUser.username = username;
-        newUser.password = password;
-        newUser.email = req.body.email;
+        newUser.email = email;
+        newUser.password=password;
+        newUser.name = req.body.name;
         newUser.save((err)=>{
           if (err){
-            console.log(err);
+
             throw err;
           }
-
           return done(null, newUser);
         });
       }
@@ -53,4 +55,50 @@ module.exports = (passport) => {
   });
 }));
 
+//login
+passport.use('local-login', new LocalStrategy({
+  usernameField : 'email',
+  passwordField : 'password',
+  passReqToCallback : true
+},(req,email,password,done)=>{
+  const currentUser = {
+    email:email,
+    password:password
+  }
+
+ return User.findOne({ email:currentUser.email}, (err,user)=>{
+
+   if(err) { return done(err);}
+
+   if(!user) {
+     const error = new Error(' Incorrect email or password');
+     error.name = 'IncorrectCredentialsError';
+     return done(error);
+   }
+   console.log(user);
+   return user.comparePassword(currentUser.password,user.password,(passwordErr,isMatch)=>{
+      console.log(isMatch);
+     if (passwordErr) {
+       return done(err);
+     }
+     if(!isMatch){
+       const error = new Error('Incorrect email or password')
+       error.name='IncorrectCredentialsError';
+       return done(error);
+     }
+     const payload={
+       sub:user._id
+     };
+
+     const token = jwt.sign(payload,configDB.jwtSecret);
+     console.log("user");
+     const data ={
+       name:user.name
+     };
+     return done(null,token,data);
+
+   })
+ })
+
+}))
 };

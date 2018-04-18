@@ -49,6 +49,7 @@ app.use(passport.initialize());
 //app.use(flash());
 //app.use(passport.session());
 //routes
+//require('./auth-check.js');
 require('./Router.js')(app,passport,io) //load routes and pass app and fully configured passport
 //listening at localhost port 3000
 server.listen(3000,()=>{
