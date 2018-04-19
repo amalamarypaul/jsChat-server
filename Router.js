@@ -1,3 +1,8 @@
+const Validation = require('./config/Validate.js');
+//The function to validate the input forms
+const ValidateSignupForm  = Validation.ValidateSignupForm;
+const ValidateLoginForm = Validation.ValidateLoginForm;
+
 const Message = require('./models/message.js');
 //all api endpoints defined here
 
@@ -7,12 +12,12 @@ module.exports = ( app,passport,io )=>{
   app.get('/',(req,res)=>{
     res.send('login page')
   })
-  app.get('/api/message/',(req,res)=>{
+  app.get('/api/messages/',(req,res)=>{
     Message.find({}).then(user=>{
       res.json(user)
     })
   })
-  app.post('/api/message/',(req,res)=>{
+  app.post('/api/messages/',(req,res)=>{
     console.log('posted');
     Message.create({
       name:req.body.name,
@@ -26,6 +31,14 @@ module.exports = ( app,passport,io )=>{
   })
   // process the signup form
   app.post('/signup',(req,res,next)=>{
+    const validationResult = ValidateSignupForm(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: validationResult.message,
+        errors: validationResult.errors
+      });
+    }
     return passport.authenticate('local-signup', (err,user,message)=>{
       if (message ) {
       return res.status(400).json({
@@ -42,6 +55,15 @@ module.exports = ( app,passport,io )=>{
   });
 
 app.post('/login',(req,res,next)=>{
+  const validationResult = ValidateLoginForm(req.body);
+  if (!validationResult.success) {
+    return res.status(400).json({
+      success: false,
+      message: validationResult.message,
+      errors: validationResult.errors
+    });
+  }
+
   return passport.authenticate('local-login',(err,token,userData)=>{
     if (err) {
       if (err.name==='IncorrectCredentialsError') {

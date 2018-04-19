@@ -2,7 +2,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const configDB = require('./database')
+const configDB = require('./database');
+
 
 // expose this function to our app using module.exports
 module.exports = (passport) => {
