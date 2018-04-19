@@ -14,8 +14,9 @@ module.exports= {
   const errors = {};
   let isFormValid = true;
   let message = '';
+  let email = decodeURIComponent(payload.email)
 
-  if (!payload || typeof payload.email !== 'string' || !validator.isEmail(payload.email)) {
+  if (!payload || typeof payload.email !== 'string' || !validator.isEmail(email)) {
     isFormValid = false;
     errors.email = 'Please provide a correct email address.';
   }
