@@ -14,9 +14,9 @@ module.exports= {
   const errors = {};
   let isFormValid = true;
   let message = '';
-  let email = decodeURIComponent(payload.email)
-
-  if (!payload || typeof payload.email !== 'string' || !validator.isEmail(email)) {
+  //let email = decodeURIComponent(payload.email)
+console.log(payload.email);
+  if (!payload || typeof payload.email !== 'string' || !validator.isEmail(payload.email)) {
     isFormValid = false;
     errors.email = 'Please provide a correct email address.';
   }
@@ -53,7 +53,7 @@ ValidateLoginForm: function(payload){
   const errors = {};
   let isFormValid = true;
   let message = '';
-
+  //let email = decodeURIComponent(payload.email)
   if (!payload || typeof payload.email !== 'string' || payload.email.trim().length === 0) {
     isFormValid = false;
     errors.email = 'Please provide your email address.';
@@ -64,9 +64,9 @@ ValidateLoginForm: function(payload){
     errors.password = 'Please provide your password.';
   }
 
-  if (!isFormValid) {
-    message = 'Check the form for errors.';
-  }
+  // if (!isFormValid) {
+  //   message = 'Check the form for errors.';
+  // }
 
   return {
     success: isFormValid,

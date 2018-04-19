@@ -3,7 +3,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const configDB = require('./database');
-
+const Validation = require('./Validate.js');
+//The function to validate the
+const ValidateSignupForm  = Validation.ValidateSignupForm;
+const ValidateLoginForm = Validation.ValidateLoginForm;
 
 // expose this function to our app using module.exports
 module.exports = (passport) => {
@@ -66,15 +69,18 @@ passport.use('local-login', new LocalStrategy({
     email:email,
     password:password
   }
-
+  const error = {
+    name:'',
+    message:''
+  }
  return User.findOne({ email:currentUser.email}, (err,user)=>{
 
    if(err) { return done(err);}
 
    if(!user) {
-     const error = new Error(' Incorrect email or password');
+     error.message= (' Incorrect email or password');
      error.name = 'IncorrectCredentialsError';
-     return done(error);
+     return done(error,null,null);
    }
    console.log(user);
    return user.comparePassword(currentUser.password,user.password,(passwordErr,isMatch)=>{

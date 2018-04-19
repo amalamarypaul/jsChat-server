@@ -49,8 +49,8 @@ app.use(passport.initialize());
 
 
 //authCheckMiddleware is for prevent unauthorised access by checking the jwt token
-const authCheckMiddleware = require('./auth-check');
-app.use('/api', authCheckMiddleware);
+// const authCheckMiddleware = require('./auth-check');
+// app.use('/api', authCheckMiddleware);
 //routes
 require('./Router.js')(app,passport,io) //load routes and pass app and fully configured passport
 //listening at localhost port 3000
