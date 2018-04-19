@@ -46,10 +46,12 @@ mongoose.connect(configDB.url,(err,db)=>{
 require('./config/passport.js')(passport);
 //required for paasport setup
 app.use(passport.initialize());
-//app.use(flash());
-//app.use(passport.session());
+
+
+//authCheckMiddleware is for prevent unauthorised access by checking the jwt token
+const authCheckMiddleware = require('./auth-check');
+app.use('/api', authCheckMiddleware);
 //routes
-//require('./auth-check.js');
 require('./Router.js')(app,passport,io) //load routes and pass app and fully configured passport
 //listening at localhost port 3000
 server.listen(3000,()=>{
