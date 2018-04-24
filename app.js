@@ -53,7 +53,9 @@ app.use(passport.initialize());
 // app.use('/api', authCheckMiddleware);
 //routes
 require('./Router.js')(app,passport,io) //load routes and pass app and fully configured passport
-//listening at localhost port 3000
-server.listen(3000,()=>{
-  console.log('App is listening at port 3000');
+
+// Listen on 3000 when in localhost, and the PORT from env var, when in production
+const PORT = process.env.PORT || 3000;
+server.listen(PORT,()=>{
+  console.log(`App is listening at port ${PORT}`);
 })
